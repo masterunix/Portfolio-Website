@@ -187,6 +187,11 @@ class HoneycombWebsite {
         
         hex.appendChild(hexContent);
         
+        // Add fast entrance animation
+        hex.style.opacity = '0';
+        hex.style.animation = `fadeInUp 0.15s ease-out forwards`;
+        hex.style.animationDelay = `${(row * 9 + col) * 8}ms`; // 8ms stagger
+        
         return hex;
     }
 
@@ -255,19 +260,211 @@ class HoneycombWebsite {
             const hex = e.target.closest('.hex');
             if (hex) {
                 const hexId = hex.getAttribute('data-hex-id');
+                let targetUrl = null;
+                
                 switch(hexId) {
                     case '1-3': // Live Projects
-                        window.location.href = 'projects.html';
+                        targetUrl = 'projects.html';
                         break;
                     case '2-3': // Skills & Journey
-                        window.location.href = 'skills.html';
+                        targetUrl = 'skills.html';
                         break;
                     case '2-4': // DSA Stats
-                        window.location.href = 'dsa.html';
+                        targetUrl = 'dsa.html';
                         break;
+                    case '1-2': // GitHub
+                        this.handleGitHubClick(hex);
+                        return;
+                    case '1-2-copy': // GitHub copy mode
+                        this.copyGitHubLink();
+                        return;
+                    case '1-4': // LinkedIn
+                        this.handleLinkedInClick(hex);
+                        return;
+                    case '1-4-copy': // LinkedIn copy mode
+                        this.copyLinkedInLink();
+                        return;
+                }
+                
+                if (targetUrl) {
+                    this.animatePageTransition(targetUrl);
                 }
             }
         });
+    }
+    
+    handleGitHubClick(hex) {
+        // Open GitHub profile
+        window.open('https://github.com/masterunix', '_blank');
+        
+        // Update hexagon content - only change description and add copy icon below
+        const hexContent = hex.querySelector('.hex-content');
+        const descSpan = hexContent.querySelector('.hex-description');
+        
+        // Change description text
+        descSpan.textContent = 'Profile opened in another tab. Try again?';
+        
+        // Add copy icon below the description
+        const copyIcon = document.createElement('img');
+        copyIcon.src = 'https://cdn-icons-png.flaticon.com/512/54/54702.png';
+        copyIcon.style.cssText = `
+            width: 16px;
+            height: 16px;
+            margin-top: 4px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        `;
+        copyIcon.className = 'copy-icon';
+        copyIcon.onmouseover = () => copyIcon.style.opacity = '1';
+        copyIcon.onmouseout = () => copyIcon.style.opacity = '0.8';
+        
+        hexContent.appendChild(copyIcon);
+        
+        // Change hex ID to indicate copy mode
+        hex.setAttribute('data-hex-id', '1-2-copy');
+        
+        // Reset after 5 seconds
+        setTimeout(() => {
+            descSpan.textContent = 'View my code repositories';
+            const existingIcon = hexContent.querySelector('.copy-icon');
+            if (existingIcon) {
+                existingIcon.remove();
+            }
+            hex.setAttribute('data-hex-id', '1-2');
+        }, 5000);
+    }
+
+    handleLinkedInClick(hex) {
+        // Open LinkedIn profile
+        window.open('https://www.linkedin.com/in/vatsal-goyal-05a896165', '_blank');
+        
+        // Update hexagon content - only change description and add copy icon below
+        const hexContent = hex.querySelector('.hex-content');
+        const descSpan = hexContent.querySelector('.hex-description');
+        
+        // Change description text
+        descSpan.textContent = 'Profile opened in another tab. Try again?';
+        
+        // Add copy icon below the description
+        const copyIcon = document.createElement('img');
+        copyIcon.src = 'https://cdn-icons-png.flaticon.com/512/54/54702.png';
+        copyIcon.style.cssText = `
+            width: 16px;
+            height: 16px;
+            margin-top: 4px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        `;
+        copyIcon.className = 'copy-icon';
+        copyIcon.onmouseover = () => copyIcon.style.opacity = '1';
+        copyIcon.onmouseout = () => copyIcon.style.opacity = '0.8';
+        
+        hexContent.appendChild(copyIcon);
+        
+        // Change hex ID to indicate copy mode
+        hex.setAttribute('data-hex-id', '1-4-copy');
+        
+        // Reset after 5 seconds
+        setTimeout(() => {
+            descSpan.textContent = 'Connect professionally';
+            const existingIcon = hexContent.querySelector('.copy-icon');
+            if (existingIcon) {
+                existingIcon.remove();
+            }
+            hex.setAttribute('data-hex-id', '1-4');
+        }, 5000);
+    }
+    
+    copyGitHubLink() {
+        const gitHubUrl = 'https://github.com/masterunix';
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(gitHubUrl).then(() => {
+            // Show success feedback
+            const hex = document.querySelector('[data-hex-id="1-2-copy"]');
+            const descSpan = hex.querySelector('.hex-description');
+            descSpan.textContent = 'Link copied to clipboard!';
+            descSpan.style.color = '#4CAF50';
+            
+            // Reset color after 2 seconds
+            setTimeout(() => {
+                descSpan.style.color = '';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = gitHubUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show success feedback
+            const hex = document.querySelector('[data-hex-id="1-2-copy"]');
+            const descSpan = hex.querySelector('.hex-description');
+            descSpan.textContent = 'Link copied to clipboard!';
+            descSpan.style.color = '#4CAF50';
+            
+            // Reset color after 2 seconds
+            setTimeout(() => {
+                descSpan.style.color = '';
+            }, 2000);
+        });
+    }
+
+    copyLinkedInLink() {
+        const linkedInUrl = 'https://www.linkedin.com/in/vatsal-goyal-05a896165';
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(linkedInUrl).then(() => {
+            // Show success feedback
+            const hex = document.querySelector('[data-hex-id="1-4-copy"]');
+            const descSpan = hex.querySelector('.hex-description');
+            descSpan.textContent = 'Link copied to clipboard!';
+            descSpan.style.color = '#4CAF50';
+            
+            // Reset color after 2 seconds
+            setTimeout(() => {
+                descSpan.style.color = '';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = linkedInUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show success feedback
+            const hex = document.querySelector('[data-hex-id="1-4-copy"]');
+            const descSpan = hex.querySelector('.hex-description');
+            descSpan.textContent = 'Link copied to clipboard!';
+            descSpan.style.color = '#4CAF50';
+            
+            // Reset color after 2 seconds
+            setTimeout(() => {
+                descSpan.style.color = '';
+            }, 2000);
+        });
+    }
+
+    animatePageTransition(targetUrl) {
+        const hexagons = this.container.querySelectorAll('.hex');
+        hexagons.forEach((hex, index) => {
+            setTimeout(() => {
+                hex.style.animation = 'fadeOutDown 0.15s ease-in forwards';
+            }, index * 8); // Very quick stagger (8ms between each)
+        });
+        
+        // Navigate after animation completes
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, hexagons.length * 8 + 150); // Total animation time + buffer
     }
     
     zoomHexagon(hex, isZooming) {
