@@ -483,24 +483,23 @@ class ProjectsHoneycomb {
 }
 
 // Initialize the projects page when DOM is loaded
-
-// Fast entrance animation
-window.addEventListener('load', () => {
-    const hexagons = document.querySelectorAll('.hex');
-    
-    hexagons.forEach((hex, index) => {
-        hex.style.opacity = '0';
-        hex.style.animation = 'fadeInUp 0.15s ease-out forwards';
-        hex.style.animationDelay = `${index * 8}ms`; // 8ms stagger for fast animation
-    });
-});
-
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing ProjectsHoneycomb');
     try {
-        new ProjectsHoneycomb();
+        const honeycomb = new ProjectsHoneycomb();
         console.log('ProjectsHoneycomb initialized successfully');
+        
+        // Start entrance animation after honeycomb is fully initialized
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const hexagons = document.querySelectorAll('.hex');
+                hexagons.forEach((hex, index) => {
+                    hex.style.opacity = '0';
+                    hex.style.animation = 'fadeInUp 0.15s ease-out forwards';
+                    hex.style.animationDelay = `${index * 6}ms`; // Slightly faster stagger
+                });
+            });
+        });
     } catch (error) {
         console.error('Error initializing ProjectsHoneycomb:', error);
     }
