@@ -447,20 +447,28 @@ body::after {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.navigation-instruction {
-    position: fixed;
-    bottom: 103px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 12px;
-    font-weight: 400;
-    text-align: center;
-    letter-spacing: 0.5px;
-    z-index: 1001;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 4px 12px;
-    border-radius: 12px;
+@media (min-width: 769px) {
+    .navigation-instruction {
+        position: fixed;
+        bottom: 103px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        font-weight: 400;
+        text-align: center;
+        letter-spacing: 0.5px;
+        z-index: 1001;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 4px 12px;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navigation-instruction {
+        display: none;
+    }
 }
 
 .nav-dots-container {
