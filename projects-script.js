@@ -7,7 +7,7 @@ class ProjectsHoneycomb {
         
         // Carousel properties
         this.carouselOffset = 0;
-        this.carouselSpeed = 0.3; // pixels per frame
+        this.carouselSpeed = 0.39; // pixels per frame (30% increase from 0.3)
         this.totalProjects = 14; // Total number of projects in center row
         this.targetOffset = 0; // For smooth navigation
         this.isNavigating = false;
@@ -172,7 +172,13 @@ class ProjectsHoneycomb {
     getCurrentCenterProject() {
         // Calculate which project is currently in the center
         const centerOffset = this.carouselOffset + (window.innerWidth / 2);
-        const projectIndex = Math.round(centerOffset / this.hexSpacingX) % this.totalProjects;
+        let projectIndex = Math.round(centerOffset / this.hexSpacingX) % this.totalProjects;
+        
+        // Ensure positive index
+        if (projectIndex < 0) {
+            projectIndex = (projectIndex + this.totalProjects) % this.totalProjects;
+        }
+        
         return Math.max(0, Math.min(this.totalProjects - 1, projectIndex));
     }
     
@@ -457,6 +463,21 @@ class ProjectsHoneycomb {
     }
     
     setupEventListeners() {
+        // Arrow key navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const currentProject = this.getCurrentCenterProject();
+                const prevProject = (currentProject - 1 + this.totalProjects) % this.totalProjects;
+                this.navigateToProject(prevProject);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const currentProject = this.getCurrentCenterProject();
+                const nextProject = (currentProject + 1) % this.totalProjects;
+                this.navigateToProject(nextProject);
+            }
+        });
+
         // Hover effects
         this.container.addEventListener('mouseover', (e) => {
             const hex = e.target.closest('.hex');
