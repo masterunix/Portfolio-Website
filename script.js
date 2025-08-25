@@ -137,8 +137,8 @@ class HoneycombWebsite {
                 color: '#0077b5' 
             },
             '2-2': { 
-                text: 'Download Resume', 
-                description: 'Get my latest CV',
+                text: 'Explore Resumes', 
+                description: 'Different resumes for different domains',
                 logo: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>',
                 color: '#34a853' 
             },
@@ -265,6 +265,9 @@ class HoneycombWebsite {
                 switch(hexId) {
                     case '1-3': // Live Projects
                         targetUrl = 'projects.html';
+                        break;
+                    case '2-2': // Explore Resumes
+                        targetUrl = 'resumes.html';
                         break;
                     case '2-3': // Skills & Journey
                         targetUrl = 'skills.html';

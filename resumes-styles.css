@@ -1,0 +1,196 @@
+/* Additional styles specific to resumes page */
+
+/* Header styling to match DSA page */
+#main-header {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    text-align: center;
+}
+
+#main-header h1 {
+    color: white;
+    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    letter-spacing: 0.02em;
+}
+
+.back-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Resume hexagon specific styling */
+.resume-hex .hex-content {
+    font-family: 'Poppins', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    line-height: 1.1;
+    max-width: 90%;
+    word-wrap: break-word;
+    letter-spacing: 0.01em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.resume-hex .hex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.resume-hex .hex-icon svg {
+    width: 18px;
+    height: 18px;
+    color: white;
+}
+
+.hex-domain {
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 2px;
+    font-family: 'Inter', sans-serif;
+}
+
+.resume-hex .hex-description {
+    font-size: 8px;
+    text-align: center;
+    line-height: 1.1;
+    opacity: 0.8;
+    color: #e0e0e0;
+    margin-bottom: 2px;
+}
+
+.resume-hex svg path {
+    fill: #2a2a2a;
+    transition: fill 0.3s ease;
+}
+
+.resume-hex:hover svg path {
+    fill: #333333;
+}
+
+.resume-hex {
+    cursor: pointer;
+}
+
+.resume-hex:hover {
+    transform: scale(1.035) !important;
+    z-index: 10 !important;
+    filter: brightness(1.2) !important;
+}
+
+/* Download status styling */
+.download-status {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.download-status.show {
+    opacity: 1;
+}
+
+.download-status.error {
+    background: rgba(244, 67, 54, 0.9);
+}
+
+/* Star rating styling */
+.hex-stars {
+    display: flex;
+    gap: 1px;
+    margin-bottom: 3px;
+}
+
+.star {
+    font-size: 10px;
+    line-height: 1;
+}
+
+.star.full {
+    color: #ffd700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.star.half {
+    color: #ffd700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.star.empty {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Download and email buttons */
+.hex-download-btn, .hex-email-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    backdrop-filter: blur(5px);
+    margin-top: 2px;
+    pointer-events: auto;
+    z-index: 100;
+    position: relative;
+}
+
+.hex-download-btn:hover, .hex-email-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.hex-download-btn:active, .hex-email-btn:active {
+    transform: translateY(0);
+}

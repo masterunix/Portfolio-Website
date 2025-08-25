@@ -13,26 +13,23 @@ class DSAHoneycomb {
     }
     
     computeSizing() {
-        // Calculate hexagon size to fill viewport with 4x6 grid
+        // Match projects page hexagon sizing exactly
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        // Optimal hexagon size
-        const baseHexWidth = Math.floor(viewportWidth / 5.69);
+        // Use exact same sizing logic as projects page
+        const baseHexWidth = Math.floor(viewportWidth / 4.27); // Reduced by 25% from /3.2
         const baseHexHeight = Math.floor(baseHexWidth * 1.1547);
         const spacingX = baseHexWidth;
         const spacingY = baseHexHeight * 0.75;
 
-        // Compute base grid size
-        const rows = 4, cols = 6;
-        const gridWidth = (cols - 1) * spacingX + baseHexWidth;
-        const gridHeight = (rows - 1) * spacingY + baseHexHeight;
-
+        // Allow hexagons to be larger, top/bottom rows can be cut off
         let scale = 1;
+        // Remove height scaling to allow overflow
 
         this.hexWidth = Math.floor(baseHexWidth * scale);
         this.hexHeight = Math.floor(baseHexHeight * scale);
-        const gapPx = 19;
+        const gapPx = Math.floor(20 * scale); // Proportional gap
         this.hexSpacingX = this.hexWidth + gapPx;
         this.hexSpacingY = this.hexHeight * 0.75 + gapPx;
     }
@@ -52,20 +49,27 @@ class DSAHoneycomb {
     }
 
     generateDSAHoneycomb() {
+        // Create 3-row honeycomb structure with proper pattern
+        const rows = 3;
+        
+        // Calculate starting position to center the middle row (row 1)
+        // Account for the middle row being offset by half spacing to the right
+        const evenRowWidth = (4 - 1) * this.hexSpacingX + this.hexWidth;
+        const gridHeight = (rows - 1) * this.hexSpacingY + this.hexHeight;
+        const startX = (window.innerWidth - evenRowWidth) / 2 - this.hexSpacingX / 2;
+        const startY = (window.innerHeight - gridHeight) / 2;
+        
         this.container.innerHTML = '';
         
-        const rows = 4;
-        const cols = 6;
-        
-        // Calculate starting position to center the grid
-        const totalGridWidth = (cols - 1) * this.hexSpacingX + this.hexWidth;
-        const totalGridHeight = (rows - 1) * this.hexSpacingY + this.hexHeight;
-        const startX = (window.innerWidth - totalGridWidth) / 2;
-        const startY = (window.innerHeight - totalGridHeight) / 2;
-
         for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
+            // Row 0 and 2 have 5 hexagons (0-4), Row 1 has 4 hexagons (0-3)
+            const colsInRow = (row === 1) ? 4 : 5;
+            
+            for (let col = 0; col < colsInRow; col++) {
                 const hex = this.createDSAHex(row, col, startX, startY);
+                // Start hexagons hidden to prevent flash before animation
+                hex.style.opacity = '0';
+                hex.style.transform = 'translateY(20px)';
                 this.container.appendChild(hex);
             }
         }
@@ -75,8 +79,9 @@ class DSAHoneycomb {
         const hex = document.createElement('div');
         hex.className = 'hex';
         
-        // Calculate position with offset for odd rows
-        const x = startX + col * this.hexSpacingX + (row % 2) * (this.hexSpacingX / 2);
+        // Use proper honeycomb positioning - odd rows offset by half spacing
+        const offsetX = (row % 2 === 1) ? this.hexSpacingX / 2 : 0;
+        const x = startX + col * this.hexSpacingX + offsetX;
         const y = startY + row * this.hexSpacingY;
         
         hex.style.left = x + 'px';
@@ -88,96 +93,17 @@ class DSAHoneycomb {
         const svg = this.createSVGHex(this.hexWidth, this.hexHeight);
         hex.appendChild(svg);
         
-        // Create hexagon content
+        // Create hexagon content with DSA data
         const hexContent = document.createElement('div');
         hexContent.className = 'hex-content';
         
         const hexId = `${row}-${col}`;
         hex.setAttribute('data-hex-id', hexId);
         
-        // DSA content data
-        const dsaContent = {
-            '0-0': { title: 'LeetCode', value: '450+', description: 'Problems solved', icon: '🔥', color: '#ff6b35' },
-            '0-1': { title: 'Contest Rating', value: '1847', description: 'Peak rating', icon: '🏆', color: '#ffa726' },
-            '0-2': { title: 'CodeChef', value: '3★', description: 'Star rating', icon: '⭐', color: '#66bb6a' },
-            '0-3': { title: 'HackerRank', value: '5★', description: 'Gold badges', icon: '🥇', color: '#ffd54f' },
-            '0-4': { title: 'Global Rank', value: 'Top 5%', description: 'Competitive coding', icon: '🌍', color: '#42a5f5' },
-            '0-5': { title: 'Streak', value: '120+', description: 'Days active', icon: '⚡', color: '#ab47bc' },
-            
-            '1-0': { title: 'Easy', value: '200+', description: 'Problems solved', icon: '🟢', color: '#4caf50', progress: 85 },
-            '1-1': { title: 'Medium', value: '180+', description: 'Problems solved', icon: '🟡', color: '#ff9800', progress: 70 },
-            '1-2': { title: 'Hard', value: '70+', description: 'Problems solved', icon: '🔴', color: '#f44336', progress: 45 },
-            '1-3': { title: 'Arrays', value: '95%', description: 'Mastery level', icon: '📊', color: '#2196f3', progress: 95 },
-            '1-4': { title: 'Trees/Graphs', value: '88%', description: 'Mastery level', icon: '🌳', color: '#4caf50', progress: 88 },
-            '1-5': { title: 'Dynamic Programming', value: '82%', description: 'Mastery level', icon: '🧩', color: '#9c27b0', progress: 82 },
-            
-            '2-0': { title: 'Strings', value: '90%', description: 'Mastery level', icon: '📝', color: '#ff5722', progress: 90 },
-            '2-1': { title: 'Linked Lists', value: '92%', description: 'Mastery level', icon: '🔗', color: '#607d8b', progress: 92 },
-            '2-2': { title: 'Stack/Queue', value: '85%', description: 'Mastery level', icon: '📚', color: '#795548', progress: 85 },
-            '2-3': { title: 'Sorting', value: '96%', description: 'Mastery level', icon: '🔄', color: '#009688', progress: 96 },
-            '2-4': { title: 'Binary Search', value: '87%', description: 'Mastery level', icon: '🎯', color: '#3f51b5', progress: 87 },
-            '2-5': { title: 'Greedy', value: '78%', description: 'Mastery level', icon: '💰', color: '#8bc34a', progress: 78 },
-            
-            '3-0': { title: 'Contests', value: '50+', description: 'Participated', icon: '🎪', color: '#e91e63' },
-            '3-1': { title: 'Hackathons', value: '12+', description: 'Won prizes', icon: '🏅', color: '#ff6f00' },
-            '3-2': { title: 'Open Source', value: '25+', description: 'Contributions', icon: '🔓', color: '#00bcd4' },
-            '3-3': { title: 'Code Reviews', value: '100+', description: 'Completed', icon: '👁️', color: '#673ab7' },
-            '3-4': { title: 'Mentoring', value: '30+', description: 'Students helped', icon: '🎓', color: '#ff9800' },
-            '3-5': { title: 'Study Time', value: '500+', description: 'Hours invested', icon: '⏰', color: '#4caf50' }
-        };
-        
-        if (dsaContent[hexId]) {
-            const item = dsaContent[hexId];
-            
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'dsa-icon';
-            iconDiv.textContent = item.icon;
-            iconDiv.style.background = `linear-gradient(135deg, ${item.color} 0%, ${this.adjustColor(item.color, -20)} 100%)`;
-            
-            const titleSpan = document.createElement('div');
-            titleSpan.className = 'dsa-title';
-            titleSpan.textContent = item.title;
-            
-            const valueSpan = document.createElement('div');
-            valueSpan.className = 'dsa-value';
-            valueSpan.textContent = item.value;
-            
-            const descSpan = document.createElement('div');
-            descSpan.className = 'dsa-description';
-            descSpan.textContent = item.description;
-            
-            hexContent.appendChild(iconDiv);
-            hexContent.appendChild(titleSpan);
-            hexContent.appendChild(valueSpan);
-            
-            // Add progress bar for mastery items
-            if (item.progress) {
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                
-                const progressFill = document.createElement('div');
-                progressFill.className = 'progress-fill';
-                progressFill.style.width = '0%';
-                
-                progressBar.appendChild(progressFill);
-                hexContent.appendChild(progressBar);
-                
-                // Animate progress bar
-                setTimeout(() => {
-                    progressFill.style.width = item.progress + '%';
-                }, 500 + (row * 6 + col) * 50);
-            }
-            
-            hexContent.appendChild(descSpan);
-            hex.classList.add('dsa-hex');
-        }
+        // Add content based on row and column
+        this.addDSAContent(hexContent, row, col);
         
         hex.appendChild(hexContent);
-        
-        // Add fast entrance animation
-        hex.style.opacity = '0';
-        hex.style.animation = `fadeInUp 0.15s ease-out forwards`;
-        hex.style.animationDelay = `${(row * 6 + col) * 8}ms`;
         
         return hex;
     }
@@ -199,17 +125,197 @@ class DSAHoneycomb {
         return this.svgTemplate.cloneNode(true);
     }
 
+    addDSAContent(hexContent, row, col) {
+        if (row === 1) {
+            // Middle row - coding platforms
+            const platforms = [
+                {
+                    name: 'Codeforces',
+                    logoPath: 'Assets/Logos/codeforces.png',
+                    url: 'https://codeforces.com/profile/resident-evil',
+                    color: '#1f8dd6'
+                },
+                {
+                    name: 'LeetCode',
+                    logoPath: 'Assets/Logos/leetcode.png',
+                    url: 'https://leetcode.com/u/vatsalgoyal/',
+                    color: '#ffa116'
+                },
+                {
+                    name: 'HackerRank',
+                    logoPath: 'Assets/Logos/hackerank.png',
+                    url: 'https://www.hackerrank.com/profile/goyalvatsal',
+                    color: '#00ea64'
+                },
+                {
+                    name: 'AtCoder',
+                    logoPath: 'Assets/Logos/atcoder.png',
+                    url: 'https://atcoder.jp/users/vatsalgoyal',
+                    color: '#3f51b5'
+                }
+            ];
+            
+            const platform = platforms[col];
+            
+            // Create platform icon with actual logo
+            const platformIcon = document.createElement('div');
+            platformIcon.className = 'dsa-icon';
+            platformIcon.style.background = `linear-gradient(135deg, ${platform.color} 0%, ${this.adjustColor(platform.color, -20)} 100%)`;
+            platformIcon.style.cursor = 'pointer';
+            platformIcon.style.width = '50px';
+            platformIcon.style.height = '50px';
+            platformIcon.style.borderRadius = '12px';
+            platformIcon.style.display = 'flex';
+            platformIcon.style.alignItems = 'center';
+            platformIcon.style.justifyContent = 'center';
+            
+            const logoImg = document.createElement('img');
+            logoImg.src = platform.logoPath;
+            logoImg.style.width = '30px';
+            logoImg.style.height = '30px';
+            logoImg.style.objectFit = 'contain';
+            logoImg.alt = platform.name;
+            platformIcon.appendChild(logoImg);
+            
+            // Create platform name
+            const platformName = document.createElement('div');
+            platformName.className = 'dsa-title';
+            platformName.textContent = platform.name;
+            platformName.style.fontSize = '14px';
+            platformName.style.fontWeight = '700';
+            platformName.style.marginBottom = '4px';
+            
+            // Create languages text
+            const languagesText = document.createElement('div');
+            languagesText.className = 'dsa-value';
+            languagesText.textContent = 'DSA Languages';
+            languagesText.style.fontSize = '12px';
+            languagesText.style.marginBottom = '3px';
+            languagesText.style.fontWeight = '600';
+            
+            // Create languages list
+            const languagesList = document.createElement('div');
+            languagesList.className = 'dsa-description';
+            languagesList.textContent = 'Python, C, C++';
+            languagesList.style.fontSize = '10px';
+            languagesList.style.marginBottom = '6px';
+            languagesList.style.opacity = '0.9';
+            
+            // Create visit button
+            const visitButton = document.createElement('button');
+            visitButton.className = 'visit-btn';
+            visitButton.textContent = 'Visit Profile';
+            visitButton.style.cssText = `
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                margin-top: 2px;
+            `;
+            
+            visitButton.addEventListener('mouseenter', () => {
+                visitButton.style.transform = 'scale(1.05)';
+                visitButton.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+            });
+            
+            visitButton.addEventListener('mouseleave', () => {
+                visitButton.style.transform = 'scale(1)';
+                visitButton.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+            });
+            
+            visitButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open(platform.url, '_blank');
+            });
+            
+            // Add click handler for platform link (fallback)
+            hexContent.style.cursor = 'pointer';
+            hexContent.addEventListener('click', () => {
+                window.open(platform.url, '_blank');
+            });
+            
+            hexContent.appendChild(platformIcon);
+            hexContent.appendChild(platformName);
+            hexContent.appendChild(languagesText);
+            hexContent.appendChild(languagesList);
+            hexContent.appendChild(visitButton);
+            
+        } else {
+            // Other rows - DSA concepts
+            const dsaConcepts = [
+                // Row 0 concepts
+                { title: 'Arrays', icon: '📊', description: 'Linear data structures', color: '#3498db' },
+                { title: 'Linked Lists', icon: '🔗', description: 'Dynamic data structures', color: '#9b59b6' },
+                { title: 'Stacks', icon: '📚', description: 'LIFO data structure', color: '#e74c3c' },
+                { title: 'Queues', icon: '🚶', description: 'FIFO data structure', color: '#f39c12' },
+                { title: 'Trees', icon: '🌳', description: 'Hierarchical structures', color: '#27ae60' },
+                // Row 2 concepts  
+                { title: 'Graphs', icon: '🕸️', description: 'Network structures', color: '#2c3e50' },
+                { title: 'Hashing', icon: '#️⃣', description: 'Key-value mapping', color: '#8e44ad' },
+                { title: 'Sorting', icon: '🔢', description: 'Ordering algorithms', color: '#d35400' },
+                { title: 'Searching', icon: '🔍', description: 'Finding algorithms', color: '#16a085' },
+                { title: 'Dynamic Programming', icon: '🧮', description: 'Optimization technique', color: '#c0392b' }
+            ];
+            
+            const conceptIndex = row === 0 ? col : (col + 5);
+            const concept = dsaConcepts[conceptIndex];
+            
+            if (concept) {
+                // Create concept icon
+                const conceptIcon = document.createElement('div');
+                conceptIcon.className = 'dsa-icon';
+                conceptIcon.textContent = concept.icon;
+                conceptIcon.style.background = `linear-gradient(135deg, ${concept.color} 0%, ${this.adjustColor(concept.color, -20)} 100%)`;
+                conceptIcon.style.width = '45px';
+                conceptIcon.style.height = '45px';
+                conceptIcon.style.borderRadius = '12px';
+                conceptIcon.style.display = 'flex';
+                conceptIcon.style.alignItems = 'center';
+                conceptIcon.style.justifyContent = 'center';
+                conceptIcon.style.fontSize = '20px';
+                conceptIcon.style.marginBottom = '8px';
+                
+                // Create concept title
+                const conceptTitle = document.createElement('div');
+                conceptTitle.className = 'dsa-title';
+                conceptTitle.textContent = concept.title;
+                conceptTitle.style.fontSize = '13px';
+                conceptTitle.style.fontWeight = '700';
+                conceptTitle.style.marginBottom = '4px';
+                conceptTitle.style.textAlign = 'center';
+                
+                // Create concept description
+                const conceptDescription = document.createElement('div');
+                conceptDescription.className = 'dsa-description';
+                conceptDescription.textContent = concept.description;
+                conceptDescription.style.fontSize = '9px';
+                conceptDescription.style.opacity = '0.8';
+                conceptDescription.style.textAlign = 'center';
+                conceptDescription.style.lineHeight = '1.2';
+                
+                hexContent.appendChild(conceptIcon);
+                hexContent.appendChild(conceptTitle);
+                hexContent.appendChild(conceptDescription);
+            }
+        }
+    }
+    
+    
     adjustColor(color, amount) {
-        const usePound = color[0] === '#';
-        const col = usePound ? color.slice(1) : color;
-        const num = parseInt(col, 16);
-        let r = (num >> 16) + amount;
-        let g = (num >> 8 & 0x00FF) + amount;
-        let b = (num & 0x0000FF) + amount;
-        r = r > 255 ? 255 : r < 0 ? 0 : r;
-        g = g > 255 ? 255 : g < 0 ? 0 : g;
-        b = b > 255 ? 255 : b < 0 ? 0 : b;
-        return (usePound ? '#' : '') + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * amount);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
     }
     
     setupEventListeners() {
@@ -260,7 +366,12 @@ window.addEventListener('load', () => {
     
     hexagons.forEach((hex, index) => {
         hex.style.opacity = '0';
-        hex.style.animation = 'fadeInUp 0.15s ease-out forwards';
-        hex.style.animationDelay = `${index * 8}ms`;
+        hex.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            hex.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            hex.style.opacity = '1';
+            hex.style.transform = 'translateY(0)';
+        }, index * 50);
     });
 });
