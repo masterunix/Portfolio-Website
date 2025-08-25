@@ -2,11 +2,15 @@ class ProjectsHoneycomb {
     constructor() {
         this.container = document.getElementById('honeycomb-container');
         this.backBtn = document.getElementById('back-btn');
+        this.navigator = document.getElementById('project-navigator');
+        this.navDotsContainer = document.querySelector('.nav-dots-container');
         
         // Carousel properties
         this.carouselOffset = 0;
         this.carouselSpeed = 0.3; // pixels per frame
         this.totalProjects = 14; // Total number of projects in center row
+        this.targetOffset = 0; // For smooth navigation
+        this.isNavigating = false;
         
         // Initial sizing
         this.computeSizing();
@@ -15,6 +19,7 @@ class ProjectsHoneycomb {
         this.resizeTimeout = null;
         
         this.init();
+        this.createNavigator();
         this.startCarousel();
     }
     
@@ -53,8 +58,102 @@ class ProjectsHoneycomb {
             this.resizeTimeout = setTimeout(() => {
                 this.computeSizing();
                 this.generateProjectHoneycomb();
+                this.createNavigator();
             }, 150);
         });
+    }
+    
+    createNavigator() {
+        this.navDotsContainer.innerHTML = '';
+        
+        // Get project data (updated for navigation)
+        const projects = [
+            { title: 'Job Nest', tech: 'MERN Stack', description: 'A comprehensive platform for job seekers and employers with advanced matching algorithms', icon: '💼', color: '#667eea', github: 'https://github.com/masterunix/JobNest-v1', visit: 'Will be deployed soon' },
+            { title: '450 House of Sourdough', tech: 'Modern Web Stack', description: 'Elegant website for artisanal sourdough bakery with e-commerce integration', icon: '🍞', color: '#d4a574', github: 'Available on request', visit: '450houseofsourdough.com' },
+            { title: 'movie_fy', tech: 'Flutter, Dart', description: 'Feature-rich mobile app for movie enthusiasts with reviews and recommendations', icon: '🎬', color: '#e74c3c', github: 'https://github.com/masterunix/Fluttter-Movie-App', visit: null },
+            { title: 'Mobile Dev Project', tech: 'React Native', description: 'Cross-platform mobile application with native performance and modern UI', icon: '📱', color: '#61dafb', github: 'Coming Soon', visit: null },
+            { title: 'WalterWins', tech: 'Full Stack', description: 'In-progress online gaming platform with real-time multiplayer capabilities', icon: '🎮', color: '#9b59b6', github: 'In Development', visit: null },
+            { title: 'Personal DIY Server', tech: 'Ubuntu, Nginx', description: 'Custom-built server infrastructure from repurposed hardware with enterprise features', icon: '🖥️', color: '#34495e', github: 'Private', visit: 'Request Access' },
+            { title: 'Jarvis 2.0', tech: 'AI/ML, Python', description: 'Advanced AI assistant with natural language processing and smart automation', icon: '🤖', color: '#f39c12', github: 'Coming Soon', visit: null },
+            { title: 'AI ML Project', tech: 'TensorFlow, PyTorch', description: 'Cutting-edge machine learning solution for data analysis and prediction', icon: '🧠', color: '#e67e22', github: 'In Development', visit: null },
+            { title: 'AI ML Project 2', tech: 'Deep Learning', description: 'Advanced neural network implementation for computer vision applications', icon: '👁️', color: '#3498db', github: 'Coming Soon', visit: null },
+            { title: 'Cyber Security Project', tech: 'Security Tools', description: 'Comprehensive cybersecurity solution with threat detection and prevention', icon: '🔒', color: '#e74c3c', github: 'Coming Soon', visit: null },
+            { title: 'DSA Stats', tech: 'Data Structures', description: 'Explore coding achievements and algorithm mastery statistics', icon: '📊', color: '#2ecc71', github: null, visit: 'dsa.html' },
+            { title: 'Skills & Journey', tech: 'Career Path', description: 'Discover technical skills, experience timeline, and professional growth', icon: '🎯', color: '#9b59b6', github: null, visit: 'skills.html' },
+            { title: 'Upcoming Project', tech: 'TBD', description: 'Exciting new project in planning phase with innovative features', icon: '🚀', color: '#95a5a6', github: 'Coming Soon', visit: null },
+            { title: 'Future Innovation', tech: 'Next-Gen Tech', description: 'Revolutionary project leveraging emerging technologies and modern frameworks', icon: '✨', color: '#f1c40f', github: 'Coming Soon', visit: null }
+        ];
+        
+        projects.forEach((project, index) => {
+            const navItem = document.createElement('div');
+            navItem.className = 'nav-item';
+            navItem.setAttribute('data-project-index', index);
+            
+            const projectIcon = document.createElement('div');
+            projectIcon.className = 'nav-project-icon';
+            projectIcon.textContent = project.icon;
+            projectIcon.style.background = `linear-gradient(135deg, ${project.color} 0%, ${this.adjustColor(project.color, -20)} 100%)`;
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'nav-tooltip';
+            tooltip.textContent = project.title;
+            
+            navItem.appendChild(projectIcon);
+            navItem.appendChild(tooltip);
+            
+            // Add click handler
+            navItem.addEventListener('click', () => {
+                this.navigateToProject(index);
+            });
+            
+            this.navDotsContainer.appendChild(navItem);
+        });
+        
+        // Set first dot as active initially
+        this.updateActiveNavDot(0);
+    }
+    
+    navigateToProject(projectIndex) {
+        // Calculate target offset to center the project in viewport
+        const viewportCenter = window.innerWidth / 2;
+        const projectPosition = projectIndex * this.hexSpacingX;
+        this.targetOffset = projectPosition - viewportCenter + (this.hexWidth / 2);
+        this.isNavigating = true;
+        
+        // Update active dot
+        this.updateActiveNavDot(projectIndex);
+        
+        // Smooth transition to target
+        const smoothTransition = () => {
+            const diff = this.targetOffset - this.carouselOffset;
+            if (Math.abs(diff) > 1) {
+                this.carouselOffset += diff * 0.1; // Smooth easing
+                requestAnimationFrame(smoothTransition);
+            } else {
+                this.carouselOffset = this.targetOffset;
+                this.isNavigating = false;
+            }
+        };
+        
+        smoothTransition();
+    }
+    
+    updateActiveNavDot(projectIndex) {
+        const navItems = this.navDotsContainer.querySelectorAll('.nav-item');
+        navItems.forEach((item, index) => {
+            if (index === projectIndex) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+    
+    getCurrentCenterProject() {
+        // Calculate which project is currently in the center
+        const centerOffset = this.carouselOffset + (window.innerWidth / 2);
+        const projectIndex = Math.round(centerOffset / this.hexSpacingX) % this.totalProjects;
+        return Math.max(0, Math.min(this.totalProjects - 1, projectIndex));
     }
     
     generateProjectHoneycomb() {
@@ -67,6 +166,7 @@ class ProjectsHoneycomb {
         const startY = (window.innerHeight - gridHeight) / 2;
         
         // Create multiple sets of hexagons for seamless carousel
+        
         for (let set = 0; set < 3; set++) { // 3 sets for smooth looping
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols; col++) {
@@ -107,20 +207,20 @@ class ProjectsHoneycomb {
         // Define content based on row
         if (row === 1) { // Center row - Projects
             const projects = [
-                { title: 'E-Commerce Platform', tech: 'React, Node.js, MongoDB', description: 'Full-stack marketplace with payment integration', icon: '🛒', color: '#667eea' },
-                { title: 'Task Manager App', tech: 'Vue.js, Firebase', description: 'Collaborative project management tool', icon: '✅', color: '#764ba2' },
-                { title: 'Weather Dashboard', tech: 'JavaScript, API', description: 'Real-time weather data visualization', icon: '🌤️', color: '#f093fb' },
-                { title: 'Chat Application', tech: 'Socket.io, Express', description: 'Real-time messaging platform', icon: '💬', color: '#4facfe' },
-                { title: 'Portfolio Website', tech: 'HTML, CSS, JS', description: 'Interactive hexagonal portfolio design', icon: '🎨', color: '#43e97b' },
-                { title: 'Data Visualizer', tech: 'D3.js, Python', description: 'Interactive charts and analytics', icon: '📊', color: '#fa709a' },
-                { title: 'Mobile Game', tech: 'React Native', description: 'Cross-platform puzzle game', icon: '🎮', color: '#fee140' },
-                { title: 'Blog Platform', tech: 'Next.js, Prisma', description: 'Modern CMS with markdown support', icon: '📝', color: '#a8edea' },
-                { title: 'AI Chatbot', tech: 'Python, TensorFlow', description: 'Natural language processing bot', icon: '🤖', color: '#d299c2' },
-                { title: 'Music Player', tech: 'React, Web Audio API', description: 'Streaming music application', icon: '🎵', color: '#89f7fe' },
-                { title: 'Fitness Tracker', tech: 'Flutter, SQLite', description: 'Health and workout monitoring', icon: '💪', color: '#667eea' },
-                { title: 'Recipe Finder', tech: 'Angular, REST API', description: 'Ingredient-based recipe search', icon: '🍳', color: '#764ba2' },
-                { title: 'Social Network', tech: 'Django, PostgreSQL', description: 'Community platform with real-time feeds', icon: '👥', color: '#ff6b6b' },
-                { title: 'Crypto Tracker', tech: 'React, Chart.js', description: 'Cryptocurrency portfolio manager', icon: '₿', color: '#4ecdc4' }
+                { title: 'Job Nest', tech: 'MERN Stack', description: 'A comprehensive platform for job seekers and employers with advanced matching algorithms', icon: '💼', color: '#667eea', github: 'https://github.com/masterunix/JobNest-v1', visit: 'Will be deployed soon' },
+                { title: '450 House of Sourdough', tech: 'Modern Web Stack', description: 'Elegant website for artisanal sourdough bakery with e-commerce integration', icon: '🍞', color: '#d4a574', github: 'Available on request', visit: '450houseofsourdough.com' },
+                { title: 'movie_fy', tech: 'Flutter, Dart', description: 'Feature-rich mobile app for movie enthusiasts with reviews and recommendations', icon: '🎬', color: '#e74c3c', github: 'https://github.com/masterunix/Fluttter-Movie-App', visit: null },
+                { title: 'Mobile Dev Project', tech: 'React Native', description: 'Cross-platform mobile application with native performance and modern UI', icon: '📱', color: '#61dafb', github: 'Coming Soon', visit: null },
+                { title: 'WalterWins', tech: 'Full Stack', description: 'In-progress online gaming platform with real-time multiplayer capabilities', icon: '🎮', color: '#9b59b6', github: 'In Development', visit: null },
+                { title: 'Personal DIY Server', tech: 'Ubuntu, Nginx', description: 'Custom-built server infrastructure from repurposed hardware with enterprise features', icon: '🖥️', color: '#34495e', github: 'Private', visit: 'Request Access' },
+                { title: 'Jarvis 2.0', tech: 'AI/ML, Python', description: 'Advanced AI assistant with natural language processing and smart automation', icon: '🤖', color: '#f39c12', github: 'Coming Soon', visit: null },
+                { title: 'AI ML Project', tech: 'TensorFlow, PyTorch', description: 'Cutting-edge machine learning solution for data analysis and prediction', icon: '🧠', color: '#e67e22', github: 'In Development', visit: null },
+                { title: 'AI ML Project 2', tech: 'Deep Learning', description: 'Advanced neural network implementation for computer vision applications', icon: '👁️', color: '#3498db', github: 'Coming Soon', visit: null },
+                { title: 'Cyber Security Project', tech: 'Security Tools', description: 'Comprehensive cybersecurity solution with threat detection and prevention', icon: '🔒', color: '#e74c3c', github: 'Coming Soon', visit: null },
+                { title: 'DSA Stats', tech: 'Data Structures', description: 'Explore coding achievements and algorithm mastery statistics', icon: '📊', color: '#2ecc71', github: null, visit: 'dsa.html' },
+                { title: 'Skills & Journey', tech: 'Career Path', description: 'Discover technical skills, experience timeline, and professional growth', icon: '🎯', color: '#9b59b6', github: null, visit: 'skills.html' },
+                { title: 'Upcoming Project', tech: 'TBD', description: 'Exciting new project in planning phase with innovative features', icon: '🚀', color: '#95a5a6', github: 'Coming Soon', visit: null },
+                { title: 'Future Innovation', tech: 'Next-Gen Tech', description: 'Revolutionary project leveraging emerging technologies and modern frameworks', icon: '✨', color: '#f1c40f', github: 'Coming Soon', visit: null }
             ];
             
             const project = projects[col % projects.length];
@@ -142,54 +242,113 @@ class ProjectsHoneycomb {
             projectDescription.className = 'project-description';
             projectDescription.textContent = project.description;
             
+            // Add action buttons for specific projects
+            const projectActions = document.createElement('div');
+            projectActions.className = 'project-actions';
+            
+            if (project.github && project.github !== 'Coming Soon' && project.github !== 'In Development' && project.github !== 'Private' && project.github !== 'Available on request') {
+                const githubBtn = document.createElement('a');
+                githubBtn.href = project.github;
+                githubBtn.target = '_blank';
+                githubBtn.className = 'project-btn github-btn';
+                githubBtn.textContent = 'GitHub';
+                githubBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(project.github, '_blank');
+                });
+                projectActions.appendChild(githubBtn);
+            }
+            
+            if (project.visit && project.visit !== 'Will be deployed soon') {
+                if (project.visit === 'Request Access') {
+                    const requestBtn = document.createElement('a');
+                    requestBtn.href = "mailto:vatsalgoyal9999@gmail.com?subject=Server Access Request&body=Hey! I'd like to explore more about your personal server and ssh access for it.";
+                    requestBtn.className = 'project-btn request-btn';
+                    requestBtn.textContent = 'Request Access';
+                    requestBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = "mailto:vatsalgoyal9999@gmail.com?subject=Server Access Request&body=Hey! I'd like to explore more about your personal server and ssh access for it.";
+                    });
+                    projectActions.appendChild(requestBtn);
+                } else if (project.visit === 'dsa.html' || project.visit === 'skills.html') {
+                    const visitBtn = document.createElement('a');
+                    visitBtn.href = project.visit;
+                    visitBtn.className = 'project-btn visit-btn';
+                    visitBtn.textContent = 'Explore';
+                    visitBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = project.visit;
+                    });
+                    projectActions.appendChild(visitBtn);
+                } else {
+                    const visitBtn = document.createElement('a');
+                    visitBtn.href = `https://${project.visit}`;
+                    visitBtn.target = '_blank';
+                    visitBtn.className = 'project-btn visit-btn';
+                    visitBtn.textContent = 'Visit';
+                    visitBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(`https://${project.visit}`, '_blank');
+                    });
+                    projectActions.appendChild(visitBtn);
+                }
+            }
+            
             hexContent.appendChild(projectIcon);
             hexContent.appendChild(projectTitle);
             hexContent.appendChild(projectTech);
             hexContent.appendChild(projectDescription);
+            if (projectActions.children.length > 0) {
+                hexContent.appendChild(projectActions);
+            }
             hex.classList.add('project-hex');
             
-        } else { // Top and bottom rows - Certifications
-            const certifications = [
-                { title: 'AWS Certified', tech: 'Cloud Solutions Architect', description: 'Professional level certification', icon: '☁️', color: '#ff9500' },
-                { title: 'Google Cloud', tech: 'Professional Developer', description: 'Advanced cloud development', icon: '🌐', color: '#4285f4' },
-                { title: 'Microsoft Azure', tech: 'DevOps Engineer', description: 'CI/CD and automation expert', icon: '⚡', color: '#0078d4' },
-                { title: 'Docker Certified', tech: 'Container Specialist', description: 'Containerization expertise', icon: '🐳', color: '#2496ed' },
-                { title: 'Kubernetes', tech: 'Application Developer', description: 'Orchestration and scaling', icon: '⚙️', color: '#326ce5' },
-                { title: 'MongoDB', tech: 'Database Administrator', description: 'NoSQL database management', icon: '🍃', color: '#47a248' },
-                { title: 'React Certified', tech: 'Frontend Specialist', description: 'Modern UI development', icon: '⚛️', color: '#61dafb' },
-                { title: 'Node.js Expert', tech: 'Backend Developer', description: 'Server-side JavaScript', icon: '🟢', color: '#339933' },
-                { title: 'Python Institute', tech: 'PCAP Certified', description: 'Programming fundamentals', icon: '🐍', color: '#3776ab' },
-                { title: 'Scrum Master', tech: 'Agile Methodology', description: 'Project management', icon: '🎯', color: '#ff6b35' },
-                { title: 'Cybersecurity', tech: 'CompTIA Security+', description: 'Information security', icon: '🔒', color: '#e74c3c' },
-                { title: 'Machine Learning', tech: 'TensorFlow Certified', description: 'AI and deep learning', icon: '🧠', color: '#ff6f00' },
-                { title: 'DevOps Foundation', tech: 'ITIL Certified', description: 'IT service management', icon: '🔄', color: '#2ecc71' },
-                { title: 'Blockchain', tech: 'Ethereum Developer', description: 'Smart contract development', icon: '⛓️', color: '#627eea' }
+        } else { // Top and bottom rows - Technologies
+            const technologies = [
+                { title: 'MongoDB', tech: 'NoSQL Database', description: 'Document-based database', icon: '🍃', color: '#47a248' },
+                { title: 'React', tech: 'Frontend Library', description: 'Component-based UI', icon: '⚛️', color: '#61dafb' },
+                { title: 'Flutter', tech: 'Mobile Framework', description: 'Cross-platform development', icon: '📱', color: '#02569b' },
+                { title: 'React Native', tech: 'Mobile Development', description: 'Native mobile apps', icon: '📲', color: '#61dafb' },
+                { title: 'Node.js', tech: 'Backend Runtime', description: 'Server-side JavaScript', icon: '🟢', color: '#339933' },
+                { title: 'Ubuntu Server', tech: 'Linux Distribution', description: 'Server operating system', icon: '🐧', color: '#e95420' },
+                { title: 'Python', tech: 'Programming Language', description: 'AI/ML development', icon: '🐍', color: '#3776ab' },
+                { title: 'TensorFlow', tech: 'ML Framework', description: 'Deep learning library', icon: '🧠', color: '#ff6f00' },
+                { title: 'PyTorch', tech: 'ML Framework', description: 'Neural network library', icon: '🔥', color: '#ee4c2c' },
+                { title: 'Nginx', tech: 'Web Server', description: 'Reverse proxy server', icon: '🌐', color: '#009639' },
+                { title: 'JavaScript', tech: 'Programming Language', description: 'Web development', icon: '⚡', color: '#f7df1e' },
+                { title: 'HTML/CSS', tech: 'Web Technologies', description: 'Frontend markup & styling', icon: '🎨', color: '#e34f26' },
+                { title: 'Express.js', tech: 'Backend Framework', description: 'Node.js web framework', icon: '🚀', color: '#000000' },
+                { title: 'Dart', tech: 'Programming Language', description: 'Flutter development', icon: '🎯', color: '#0175c2' }
             ];
             
-            const cert = certifications[col % certifications.length];
+            const tech = technologies[col % technologies.length];
             
-            const certIcon = document.createElement('div');
-            certIcon.className = 'cert-icon';
-            certIcon.textContent = cert.icon;
-            certIcon.style.background = `linear-gradient(135deg, ${cert.color} 0%, ${this.adjustColor(cert.color, -20)} 100%)`;
+            const techIcon = document.createElement('div');
+            techIcon.className = 'tech-icon';
+            techIcon.textContent = tech.icon;
+            techIcon.style.background = `linear-gradient(135deg, ${tech.color} 0%, ${this.adjustColor(tech.color, -20)} 100%)`;
             
-            const certTitle = document.createElement('div');
-            certTitle.className = 'cert-title';
-            certTitle.textContent = cert.title;
+            const techTitle = document.createElement('div');
+            techTitle.className = 'tech-title';
+            techTitle.textContent = tech.title;
             
-            const certTech = document.createElement('div');
-            certTech.className = 'cert-tech';
-            certTech.textContent = cert.tech;
+            const techType = document.createElement('div');
+            techType.className = 'tech-type';
+            techType.textContent = tech.tech;
             
-            const certDescription = document.createElement('div');
-            certDescription.className = 'cert-description';
-            certDescription.textContent = cert.description;
+            const techDescription = document.createElement('div');
+            techDescription.className = 'tech-description';
+            techDescription.textContent = tech.description;
             
-            hexContent.appendChild(certIcon);
-            hexContent.appendChild(certTitle);
-            hexContent.appendChild(certTech);
-            hexContent.appendChild(certDescription);
-            hex.classList.add('cert-hex');
+            hexContent.appendChild(techIcon);
+            hexContent.appendChild(techTitle);
+            hexContent.appendChild(techType);
+            hexContent.appendChild(techDescription);
+            hex.classList.add('tech-hex');
         }
         
         hex.appendChild(hexContent);
@@ -213,31 +372,6 @@ class ProjectsHoneycomb {
     }
     
     shouldSkipHexagon(row, col) {
-        // No hexagons to skip in carousel - all positions are used
-        return false;
-    }
-
-    startCarousel() {
-        const animate = () => {
-            // Update all hexagon positions
-            const hexagons = document.querySelectorAll('.carousel-hex');
-            hexagons.forEach(hex => {
-                let currentLeft = parseFloat(hex.style.left);
-                currentLeft -= this.carouselSpeed;
-                
-                // Reset position when hexagon moves completely off screen to the left
-                const setWidth = 14 * this.hexSpacingX;
-                if (currentLeft <= -setWidth) {
-                    currentLeft += 3 * setWidth; // Move to the end of the carousel
-                }
-                
-                hex.style.left = currentLeft + 'px';
-            });
-            
-            requestAnimationFrame(animate);
-        };
-        
-        requestAnimationFrame(animate);
     }
 
     adjustColor(color, amount) {
@@ -249,6 +383,51 @@ class ProjectsHoneycomb {
         return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
             (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
             (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    }
+    
+    startCarousel() {
+        let lastUpdateTime = 0;
+        
+        const animate = (currentTime) => {
+            // Only auto-scroll when not navigating
+            if (!this.isNavigating && currentTime - lastUpdateTime > 16) { // ~60fps
+                this.carouselOffset += this.carouselSpeed;
+                lastUpdateTime = currentTime;
+                
+                // Update active nav dot based on current center project
+                const centerProject = this.getCurrentCenterProject();
+                this.updateActiveNavDot(centerProject);
+            }
+            
+            // Update hexagon positions for all rows
+            const hexagons = this.container.querySelectorAll('.hex');
+            hexagons.forEach((hex, index) => {
+                const totalHexagons = 42; // 3 rows × 14 cols = 42 hexagons per set
+                const setIndex = Math.floor(index / totalHexagons);
+                const hexInSet = index % totalHexagons;
+                const row = Math.floor(hexInSet / 14);
+                const col = hexInSet % 14;
+                
+                // Move all rows, not just center row
+                const offsetX = (row % 2 === 1) ? this.hexSpacingX / 2 : 0;
+                const baseX = col * this.hexSpacingX + offsetX;
+                const setOffset = setIndex * (this.totalProjects * this.hexSpacingX);
+                const x = baseX + setOffset - this.carouselOffset;
+                
+                // Wrap around for seamless looping - start from left edge
+                const totalWidth = this.totalProjects * this.hexSpacingX * 3; // 3 sets
+                let wrappedX = ((x % totalWidth) + totalWidth) % totalWidth;
+                
+                // Shift to start from left edge instead of having empty space
+                wrappedX = wrappedX - this.hexSpacingX;
+                
+                hex.style.left = wrappedX + 'px';
+            });
+            
+            requestAnimationFrame(animate);
+        };
+        
+        requestAnimationFrame(animate);
     }
     
     setupEventListeners() {
@@ -274,8 +453,13 @@ class ProjectsHoneycomb {
             window.location.href = 'index.html';
         });
 
-        // Project click handlers (placeholder for future functionality)
+        // Project click handlers - allow buttons to work
         this.container.addEventListener('click', (e) => {
+            // Don't interfere with button clicks
+            if (e.target.closest('.project-btn')) {
+                return;
+            }
+            
             const hex = e.target.closest('.hex');
             if (hex && hex.classList.contains('project-hex')) {
                 const hexId = hex.getAttribute('data-hex-id');

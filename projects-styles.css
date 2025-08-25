@@ -181,28 +181,28 @@ body {
     padding: 16px;
 }
 
-.cert-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px;
+.cert-icon, .tech-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    margin-bottom: 6px;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    font-size: 24px;
+    color: white;
+    margin: 0 auto 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.cert-title {
-    font-size: 16px;
-    font-weight: 700;
+.cert-title, .tech-title {
+    font-size: 13px;
+    font-weight: 600;
     text-align: center;
     line-height: 1.2;
     margin-bottom: 4px;
 }
 
-.cert-tech {
+.cert-tech, .tech-type {
     font-size: 11px;
     opacity: 0.9;
     text-align: center;
@@ -211,7 +211,7 @@ body {
     margin-bottom: 4px;
 }
 
-.cert-description {
+.cert-description, .tech-description {
     font-size: 10px;
     opacity: 0.8;
     text-align: center;
@@ -221,12 +221,12 @@ body {
     max-width: 100%;
 }
 
-.cert-hex svg path {
+.cert-hex svg path, .tech-hex svg path {
     fill: #2a2a2a;
     transition: fill 0.3s ease;
 }
 
-.cert-hex:hover svg path {
+.cert-hex:hover svg path, .tech-hex:hover svg path {
     fill: #333333;
 }
 
@@ -239,9 +239,64 @@ body {
     fill: #333333;
 }
 
-.project-hex:hover {
+.project-hex:hover, .tech-hex:hover {
     transform: scale(1.05);
     filter: brightness(1.2);
+}
+
+/* Project Action Buttons */
+.project-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.project-btn {
+    padding: 4px 8px;
+    font-size: 9px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.github-btn {
+    background: linear-gradient(135deg, #333 0%, #000 100%);
+    color: white;
+}
+
+.github-btn:hover {
+    background: linear-gradient(135deg, #555 0%, #333 100%);
+    transform: scale(1.05);
+}
+
+.visit-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+}
+
+.visit-btn:hover {
+    background: linear-gradient(135deg, #5CBF60 0%, #4CAF50 100%);
+    transform: scale(1.05);
+}
+
+.request-btn {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+}
+
+.request-btn:hover {
+    background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+    transform: scale(1.05);
 }
 
 /* Vignette overlays */
@@ -343,4 +398,78 @@ body::after {
         height: 36px;
         font-size: 18px;
     }
+}
+
+/* Project Navigator */
+#project-navigator {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-dots-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.nav-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-project-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nav-item:hover .nav-project-icon {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.nav-item.active .nav-project-icon {
+    transform: scale(1.15);
+    border-color: white;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.nav-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-item:hover .nav-tooltip {
+    opacity: 1;
 }
