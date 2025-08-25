@@ -311,5 +311,32 @@ class SkillsWebsite {
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Initializing Skills Website...');
-    new SkillsWebsite();
+    // Save instance globally for BFCache restores
+    window.skillsSite = new SkillsWebsite();
+});
+
+// Ensure correct state when returning via browser back/forward (BFCache)
+window.addEventListener('pageshow', (event) => {
+    try {
+        const isBFCacheRestore = event.persisted ||
+            (performance && performance.getEntriesByType &&
+             performance.getEntriesByType('navigation')[0]?.type === 'back_forward');
+        if (isBFCacheRestore) {
+            if (window.skillsSite) {
+                window.skillsSite.computeSizing();
+                window.skillsSite.generateHexagons();
+            } else {
+                const container = document.getElementById('honeycomb-container');
+                if (container) {
+                    container.querySelectorAll('.hex').forEach((hex) => {
+                        hex.style.opacity = '';
+                        hex.style.animation = '';
+                        hex.classList.remove('fade-in');
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Skills pageshow handler error:', e);
+    }
 });

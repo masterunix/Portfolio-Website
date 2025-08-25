@@ -490,7 +490,8 @@ class HoneycombWebsite {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing HoneycombWebsite');
     try {
-        new HoneycombWebsite();
+        // Save instance globally to allow re-initialization on BFCache restore
+        window.honeycombSite = new HoneycombWebsite();
         console.log('HoneycombWebsite initialized successfully');
     } catch (error) {
         console.error('Error initializing HoneycombWebsite:', error);
@@ -506,4 +507,33 @@ window.addEventListener('load', () => {
         hex.style.animationDelay = `${index * 50}ms`;
         hex.classList.add('fade-in');
     });
+});
+
+// Ensure proper state when returning via browser back/forward (BFCache)
+window.addEventListener('pageshow', (event) => {
+    try {
+        const isBFCacheRestore = event.persisted ||
+            (performance && performance.getEntriesByType &&
+             performance.getEntriesByType('navigation')[0]?.type === 'back_forward');
+
+        if (isBFCacheRestore) {
+            // Regenerate to clear any lingering inline styles from exit animation
+            if (window.honeycombSite) {
+                window.honeycombSite.computeSizing();
+                window.honeycombSite.generateMainHoneycomb();
+            } else {
+                // Fallback: minimal reset if instance not found
+                const container = document.getElementById('honeycomb-container');
+                if (container) {
+                    container.querySelectorAll('.hex').forEach((hex) => {
+                        hex.style.opacity = '';
+                        hex.style.animation = '';
+                        hex.classList.remove('fade-in');
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error('pageshow handler error:', e);
+    }
 });

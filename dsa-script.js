@@ -377,7 +377,8 @@ class DSAHoneycomb {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new DSAHoneycomb();
+    // Save instance globally for BFCache restores
+    window.dsaSite = new DSAHoneycomb();
 });
 
 // Fast entrance animation
@@ -394,4 +395,32 @@ window.addEventListener('load', () => {
             hex.style.transform = 'translateY(0)';
         }, index * 50);
     });
+});
+
+// Ensure proper state when returning via browser back/forward (BFCache)
+window.addEventListener('pageshow', (event) => {
+    try {
+        const isBFCacheRestore = event.persisted ||
+            (performance && performance.getEntriesByType &&
+             performance.getEntriesByType('navigation')[0]?.type === 'back_forward');
+
+        if (isBFCacheRestore) {
+            if (window.dsaSite) {
+                window.dsaSite.computeSizing();
+                window.dsaSite.generateDSAHoneycomb();
+            } else {
+                const container = document.getElementById('honeycomb-container');
+                if (container) {
+                    container.querySelectorAll('.hex').forEach((hex) => {
+                        hex.style.opacity = '';
+                        hex.style.animation = '';
+                        hex.classList.remove('fade-in');
+                        hex.style.transform = '';
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error('DSA pageshow handler error:', e);
+    }
 });

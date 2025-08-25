@@ -533,11 +533,40 @@ class ProjectsHoneycomb {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing ProjectsHoneycomb');
     try {
-        const honeycomb = new ProjectsHoneycomb();
+        // Save instance globally to allow re-initialization on BFCache restore
+        window.projectsSite = new ProjectsHoneycomb();
         console.log('ProjectsHoneycomb initialized successfully');
         
         // Entrance animation is now handled in createHexagon method
     } catch (error) {
         console.error('Error initializing ProjectsHoneycomb:', error);
+    }
+});
+
+// Ensure proper state when returning via browser back/forward (BFCache)
+window.addEventListener('pageshow', (event) => {
+    try {
+        const isBFCacheRestore = event.persisted ||
+            (performance && performance.getEntriesByType &&
+             performance.getEntriesByType('navigation')[0]?.type === 'back_forward');
+
+        if (isBFCacheRestore) {
+            if (window.projectsSite) {
+                window.projectsSite.computeSizing();
+                window.projectsSite.generateProjectHoneycomb();
+                window.projectsSite.createNavigator();
+            } else {
+                const container = document.getElementById('honeycomb-container');
+                if (container) {
+                    container.querySelectorAll('.hex').forEach((hex) => {
+                        hex.style.opacity = '';
+                        hex.style.animation = '';
+                        hex.classList.remove('fade-in');
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error('projects pageshow handler error:', e);
     }
 });

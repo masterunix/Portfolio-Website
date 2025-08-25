@@ -448,7 +448,8 @@ class ResumesWebsite {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing ResumesWebsite');
     try {
-        new ResumesWebsite();
+        // Save instance globally to allow re-initialization on BFCache restore
+        window.resumesSite = new ResumesWebsite();
         console.log('ResumesWebsite initialized successfully');
     } catch (error) {
         console.error('Error initializing ResumesWebsite:', error);
@@ -464,4 +465,31 @@ window.addEventListener('load', () => {
         hex.style.animationDelay = `${index * 50}ms`;
         hex.classList.add('fade-in');
     });
+});
+
+// Ensure proper state when returning via browser back/forward (BFCache)
+window.addEventListener('pageshow', (event) => {
+    try {
+        const isBFCacheRestore = event.persisted ||
+            (performance && performance.getEntriesByType &&
+             performance.getEntriesByType('navigation')[0]?.type === 'back_forward');
+
+        if (isBFCacheRestore) {
+            if (window.resumesSite) {
+                window.resumesSite.computeSizing();
+                window.resumesSite.generateMainHoneycomb();
+            } else {
+                const container = document.getElementById('honeycomb-container');
+                if (container) {
+                    container.querySelectorAll('.hex').forEach((hex) => {
+                        hex.style.opacity = '';
+                        hex.style.animation = '';
+                        hex.classList.remove('fade-in');
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error('resumes pageshow handler error:', e);
+    }
 });
