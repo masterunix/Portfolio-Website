@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Skills Page</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #000; color: white; }
+        #honeycomb-container { width: 100%; height: 100vh; position: relative; }
+        .hex { 
+            position: absolute; 
+            background: red; 
+            width: 50px; 
+            height: 50px; 
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Skills Test Page</h1>
+    <div id="honeycomb-container">
+        <!-- Test container -->
+    </div>
+
+    <script>
+        console.log('Test script starting...');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded');
+            const container = document.getElementById('honeycomb-container');
+            console.log('Container found:', container);
+            
+            // Create a simple test hexagon
+            const testHex = document.createElement('div');
+            testHex.className = 'hex';
+            testHex.style.left = '100px';
+            testHex.style.top = '100px';
+            testHex.textContent = 'TEST';
+            
+            container.appendChild(testHex);
+            console.log('Test hexagon added');
+        });
+    </script>
+</body>
+</html>

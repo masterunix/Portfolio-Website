@@ -1,6 +1,7 @@
 class ResumesWebsite {
     constructor() {
         this.container = document.getElementById('honeycomb-container');
+        this.backBtn = document.getElementById('back-btn');
         
         // Initial sizing
         this.computeSizing();
@@ -11,6 +12,25 @@ class ResumesWebsite {
         this.init();
     }
     
+    typeHeaderText() {
+        const headerElement = document.querySelector('#main-header h1');
+        const text = "Different Domains, Different Resumes";
+        headerElement.textContent = "";
+        headerElement.style.borderRight = "3px solid white";
+        headerElement.style.animation = "blink-cursor 0.75s step-end infinite";
+        
+        let i = 0;
+        const typeChar = () => {
+            if (i < text.length) {
+                headerElement.textContent = text.substring(0, i + 1);
+                i++;
+                setTimeout(typeChar, 50); // 50ms per character like homepage
+            }
+        };
+        
+        typeChar();
+    }
+
     computeSizing() {
         // Calculate hexagon size to fill viewport with 6x9 grid
         const viewportWidth = window.innerWidth;
@@ -43,6 +63,7 @@ class ResumesWebsite {
     }
 
     init() {
+        this.typeHeaderText();
         this.generateMainHoneycomb();
         this.setupEventListeners();
         

@@ -48,7 +48,27 @@ class ProjectsHoneycomb {
         this.hexSpacingY = this.hexHeight * 0.75 + gapPx;
     }
 
+    typeHeaderText() {
+        const headerElement = document.querySelector('#main-header h1');
+        const text = "My Projects & Work";
+        headerElement.textContent = "";
+        headerElement.style.borderRight = "3px solid white";
+        headerElement.style.animation = "blink-cursor 0.75s step-end infinite";
+        
+        let i = 0;
+        const typeChar = () => {
+            if (i < text.length) {
+                headerElement.textContent = text.substring(0, i + 1);
+                i++;
+                setTimeout(typeChar, 50); // 50ms per character like homepage
+            }
+        };
+        
+        typeChar();
+    }
+
     init() {
+        this.typeHeaderText();
         this.generateProjectHoneycomb();
         this.setupEventListeners();
         
@@ -352,6 +372,12 @@ class ProjectsHoneycomb {
         }
         
         hex.appendChild(hexContent);
+        
+        // Add entrance animation
+        hex.style.opacity = '0';
+        hex.style.animation = `fadeInUp 0.15s ease-out forwards`;
+        hex.style.animationDelay = `${(row * 14 + col + set * 42) * 8}ms`; // 8ms stagger
+        
         return hex;
     }
 
@@ -489,17 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const honeycomb = new ProjectsHoneycomb();
         console.log('ProjectsHoneycomb initialized successfully');
         
-        // Start entrance animation after honeycomb is fully initialized
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const hexagons = document.querySelectorAll('.hex');
-                hexagons.forEach((hex, index) => {
-                    hex.style.opacity = '0';
-                    hex.style.animation = 'fadeInUp 0.15s ease-out forwards';
-                    hex.style.animationDelay = `${index * 6}ms`; // Slightly faster stagger
-                });
-            });
-        });
+        // Entrance animation is now handled in createHexagon method
     } catch (error) {
         console.error('Error initializing ProjectsHoneycomb:', error);
     }

@@ -34,7 +34,27 @@ class DSAHoneycomb {
         this.hexSpacingY = this.hexHeight * 0.75 + gapPx;
     }
 
+    typeHeaderText() {
+        const headerElement = document.querySelector('#main-header h1');
+        const text = "DSA Stats";
+        headerElement.textContent = "";
+        headerElement.style.borderRight = "3px solid white";
+        headerElement.style.animation = "blink-cursor 0.75s step-end infinite";
+        
+        let i = 0;
+        const typeChar = () => {
+            if (i < text.length) {
+                headerElement.textContent = text.substring(0, i + 1);
+                i++;
+                setTimeout(typeChar, 50); // 50ms per character like homepage
+            }
+        };
+        
+        typeChar();
+    }
+
     init() {
+        this.typeHeaderText();
         this.generateDSAHoneycomb();
         this.setupEventListeners();
         

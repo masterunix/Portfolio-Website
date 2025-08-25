@@ -275,6 +275,9 @@ class HoneycombWebsite {
                     case '2-4': // DSA Stats
                         targetUrl = 'dsa.html';
                         break;
+                    case '2-5': // Mail Me
+                        window.open('mailto:vatsalgoyal9999@gmail.com?subject=Hey! I came here from vatsalgoyal.me', '_blank');
+                        return;
                     case '1-2': // GitHub
                         this.handleGitHubClick(hex);
                         return;
