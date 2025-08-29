@@ -62,3 +62,4 @@ The website automatically adjusts for different screen sizes:
 - Minimal DOM manipulation
 
 Enjoy exploring the honeycomb website!
+
