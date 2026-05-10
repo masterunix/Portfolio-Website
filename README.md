@@ -1,65 +1,45 @@
-# Honeycomb Website
+# Honeycomb Portfolio System
 
-A modern, interactive website featuring a honeycomb grid layout with clickable cells and zoom functionality.
+A high-performance, interactive portfolio website featuring a liquid glass honeycomb grid layout with dynamic animations and cross-browser optimized glassmorphism.
 
-## Features
+## 🚀 Key Features
+- **Liquid Glass UI**: Stunning hexagonal grid with backdrop-blur and organic glow effects.
+- **Unified Mobile Experience**: High-performance mobile navigation and interaction system.
+- **Semantic HTML5**: Optimized for SEO and accessibility.
+- **Modern File Structure**: Organized directory system for easy maintenance.
+- **Hardware Accelerated**: Optimized CSS transitions and GPU-composited layers for 60FPS performance.
 
-- **Honeycomb Grid Layout**: Beautiful hexagonal grid pattern with orange wireframes
-- **Black Background**: Sleek dark theme for modern aesthetics
-- **Clickable Cells**: Some honeycomb cells are interactive and clickable
-- **Zoom Functionality**: Click on clickable cells to zoom into a detailed honeycomb view
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Smooth Animations**: Elegant entrance animations and hover effects
+## 📁 Project Structure
+```text
+/
+├── index.html          # Main landing page
+├── projects.html       # Projects showcase
+├── skills.html         # Technical skills & journey
+├── resumes.html        # Resume download center
+├── dsa.html            # Data Structures & Algorithms stats
+├── js/                 # Unified JavaScript logic
+│   ├── mobile.js       # Core mobile-specific interactions
+│   ├── splash-system.js# Entrance animation logic
+│   └── [page]-script.js# Page-specific functionality
+├── css/                # Modular CSS styles
+│   ├── styles.css      # Core design system
+│   └── [page]-styles.css# Page-specific styling
+└── Assets/             # Optimized images and documents
+```
 
-## How to Use
+## 🛠️ Customization
+### Theming
+Modify the core CSS variables in `css/styles.css` to change the visual identity:
+- **Primary Glow**: `#ff6600`
+- **Background**: `#000000` (Pure Black)
 
-1. **Open the Website**: Open `index.html` in your web browser
-2. **Navigate the Grid**: The main page displays a honeycomb grid with various cells
-3. **Identify Clickable Cells**: Clickable cells have brighter orange borders and show "Click X-Y" text
-4. **Click to Zoom**: Click on any clickable cell to open a detailed zoom view
-5. **Close Zoom View**: Use the × button, click outside the content, or press ESC key
+### Grid Management
+Adjust the `rows` and `cols` variables in `js/script.js` to modify the density of the honeycomb grid.
 
-## File Structure
+## 🌐 Browser Support
+- **Chrome**: Fully Optimized (Recommended)
+- **Safari**: Optimized with backdrop-filter fallbacks
+- **Firefox**: Performance-tuned via SVG masking
 
-- `index.html` - Main HTML structure
-- `styles.css` - CSS styling for honeycomb layout and animations
-- `script.js` - JavaScript functionality for grid generation and interactions
-- `README.md` - This documentation file
-
-## Customization
-
-### Making Cells Clickable
-Edit the `isClickableCell(row, col)` function in `script.js` to change which cells are interactive.
-
-### Changing Colors
-Modify the CSS variables in `styles.css`:
-- Main orange: `#ff6600`
-- Hover orange: `#ff8533`
-- Background: `#000`
-
-### Grid Size
-Adjust the `rows` and `cols` variables in the `generateMainHoneycomb()` function to change the grid dimensions.
-
-## Browser Compatibility
-
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-
-## Responsive Design
-
-The website automatically adjusts for different screen sizes:
-- Desktop: Full-size honeycomb cells
-- Tablet: Medium-sized cells
-- Mobile: Compact cells for touch interaction
-
-## Performance
-
-- Optimized CSS with hardware acceleration
-- Efficient JavaScript event handling
-- Smooth animations with CSS transitions
-- Minimal DOM manipulation
-
-Enjoy exploring the honeycomb website!
-
+## 📄 License
+© 2025 Vatsal Goyal. All rights reserved.
